@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug CLI Directly",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/ChromeDevToolsGeneratorCLI/bin/Debug/net9.0/ChromeDevToolsGeneratorCLI.dll",
+      "args": ["-o", "/tmp/ChromeDevToolsRuntime"],
+      "cwd": "${workspaceFolder}/src/ChromeDevToolsGeneratorCLI",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}
