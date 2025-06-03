@@ -149,7 +149,7 @@
         /// <returns></returns>
         public static async Task<string> GetBrowserProtocolForChromeVersion(ChromeVersion chromeVersion)
         {
-            var browserProtocolUrl = $"https://chromium.googlesource.com/chromium/src/+/{chromeVersion.WebKitVersionHash}/third_party/blink/public/devtools_protocol/browser_protocol.pdl?format=TEXT";
+            var browserProtocolUrl = $"https://chromium.googlesource.com/chromium/src/+/{chromeVersion.BrowserVersion}/third_party/blink/public/devtools_protocol/browser_protocol.pdl?format=TEXT";
 
             using (var browserProtocolClient = new HttpClient())
             {
@@ -178,7 +178,7 @@
         /// <returns></returns>
         public static async Task<string> GetInspectorProtocolConverterPythonScript(ChromeVersion chromeVersion)
         {
-            var protocolScriptUrl = $"https://chromium.googlesource.com/chromium/src/+/{chromeVersion.WebKitVersionHash}/third_party/inspector_protocol/pdl.py?format=TEXT";
+            var protocolScriptUrl = $"https://chromium.googlesource.com/chromium/src/+/{chromeVersion.BrowserVersion}/third_party/inspector_protocol/pdl.py?format=TEXT";
             using (var jsProtocolClient = new HttpClient())
             {
                 var script64 = await jsProtocolClient.GetStringAsync(protocolScriptUrl);
