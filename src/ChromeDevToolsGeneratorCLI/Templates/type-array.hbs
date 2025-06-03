@@ -1,0 +1,15 @@
+namespace {{rootNamespace}}.{{domain.Name}}
+{
+    using System.Collections.Generic;
+    using Newtonsoft.Json;
+
+    /// <summary>
+    /// {{xml-code-comment type.Description 1}}
+    /// </summary>
+    {{#if type.Experimental}}
+    [Obsolete("Experimental")]
+    {{/if}}
+    public sealed class {{className}} : List<{{#if type.Items.TypeReference}}{{dehumanize type.Items.TypeReference}}{{else}}{{typemap context type.Items}}{{/if}}>
+    {
+    }
+}

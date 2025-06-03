@@ -44,6 +44,11 @@
                 TemplatePath = "type-enum.hbs",
                 OutputPath = "{{domainName}}\\{{className}}.cs",
             };
+            TypeArrayWrapperTemplate = new CodeGenerationTemplateSettings
+            {
+                TemplatePath = "type-array.hbs",
+                OutputPath = "{{domainName}}\\{{className}}.cs",
+            };
         }
 
         [JsonProperty("domainTemplate")]
@@ -87,6 +92,9 @@
             get;
             set;
         }
+
+        [JsonProperty("typeArrayWrapperTemplate")]
+        public CodeGenerationTemplateSettings TypeArrayWrapperTemplate { get; set; }
 
     }
 }

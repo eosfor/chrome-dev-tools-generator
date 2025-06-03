@@ -131,42 +131,63 @@
                                 };
                             break;
                         case "array":
-                            if ((type.Items == null || String.IsNullOrWhiteSpace(type.Items.Type)) && type.Items.TypeReference != "StringIndex")
                             {
-                                throw new NotImplementedException("Did not expect a top-level domain array type to specify a TypeReference");
-                            }
+                                if (type.Items == null)
+                                {
+                                    throw new NotImplementedException("Top-level array type must define 'items'.");
+                                }
 
-                            string itemType;
-                            switch (type.Items.Type)
-                            {
-                                case "string":
-                                    itemType = "string";
-                                    break;
-                                case "number":
-                                    itemType = "double";
-                                    break;
-                                case null:
-                                    if (String.IsNullOrWhiteSpace(type.Items.TypeReference))
-                                        throw new NotImplementedException($"Did not expect a top-level domain array type to have a null type and a null or whitespace type reference.");
+                                string itemType;
+                                bool isPrimitive;
 
-                                    switch (type.Items.TypeReference)
+                                if (!string.IsNullOrWhiteSpace(type.Items.Type))
+                                {
+                                    switch (type.Items.Type)
                                     {
-                                        case "StringIndex":
+                                        case "string":
                                             itemType = "string";
+                                            isPrimitive = true;
+                                            break;
+                                        case "number":
+                                            itemType = "double";
+                                            isPrimitive = true;
+                                            break;
+                                        case "integer":
+                                            itemType = "long";
+                                            isPrimitive = true;
+                                            break;
+                                        case "boolean":
+                                            itemType = "bool";
+                                            isPrimitive = true;
                                             break;
                                         default:
-                                            throw new NotImplementedException($"Did not expect a top-level domain array type to specify a type reference of {type.Items.TypeReference}");
+                                            throw new NotImplementedException($"Unsupported primitive array item type: {type.Items.Type}");
                                     }
-                                    break;
-                                default:
-                                    throw new NotImplementedException($"Did not expect a top-level domain array type to specify items of type {type.Items.Type}");
+                                }
+                                else if (!string.IsNullOrWhiteSpace(type.Items.TypeReference))
+                                {
+                                    var refKey = $"{domain.Name}.{type.Items.TypeReference}";
+                                    if (!knownTypes.TryGetValue(refKey, out var refTypeInfo))
+                                    {
+                                        throw new InvalidOperationException($"Unknown TypeReference: {type.Items.TypeReference} (expected in domain {domain.Name})");
+                                    }
+
+                                    itemType = refTypeInfo.TypeName;
+                                    isPrimitive = refTypeInfo.IsPrimitive;
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Array items must define either a 'type' or a 'typeReference'.");
+                                }
+
+                                typeInfo = new TypeInfo
+                                {
+                                    IsPrimitive = isPrimitive,
+                                    TypeName = $"{itemType}[]"
+                                };
+
+                                break;
                             }
-                            typeInfo = new TypeInfo
-                            {
-                                IsPrimitive = true,
-                                TypeName = $"{itemType}[]"
-                            };
-                            break;
                         case "number":
                             typeInfo = new TypeInfo
                             {

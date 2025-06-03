@@ -39,6 +39,9 @@
                 case "string":
                     templateSettings = Settings.DefinitionTemplates.TypeEnumTemplate;
                     break;
+                case "array":
+                    templateSettings = Settings.DefinitionTemplates.TypeArrayWrapperTemplate;
+                    break;
                 default:
                     throw new InvalidOperationException($"Unsupported Type Definition Type: {typeDefinition.Type}");
             }
