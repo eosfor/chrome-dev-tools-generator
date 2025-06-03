@@ -1,8 +1,18 @@
 ﻿namespace ChromeDevToolsGeneratorCLI
 {
-    using IronPython.Hosting;
-    using Microsoft.Scripting.Hosting;
     using Newtonsoft.Json.Linq;
+
+    using CSnakes.Runtime;
+    using CSnakes.Runtime.Python;
+
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text.Json;
+    using Microsoft.Scripting.Utils;
 
     /// <summary>
     /// Uses IronPython to convert the chromium protocol to other formats using the provided chromium pdl script
@@ -12,31 +22,63 @@
     /// </remarks>
     public class PdlConverter
     {
-        private ScriptEngine Engine
+
+        public PdlConverter(string folder)
         {
-            get;
-            set;
+
+            var builder = Host.CreateDefaultBuilder()
+                .ConfigureServices(services =>
+                {
+                    var home = Path.Join(folder); /* Path to your Python modules */
+                    var venv = Path.Join(home, ".venv");
+                    services
+                        .WithPython()
+                        .WithHome(home)
+                        .WithVirtualEnvironment(venv)
+                        .FromRedistributable(); // Download Python 3.12 and store it locally
+                });
+
+            var app = builder.Build();
+
+            var env = app.Services.GetRequiredService<IPythonEnvironment>();
+
+            this.logger = env.Logger;
+            using (GIL.Acquire())
+            {
+                logger.LogInformation("Importing module {ModuleName}", "converter");
+                module = Import.ImportModule("converter");
+            }
         }
 
-        private dynamic Scope
-        {
-            get;
-            set;
-        }
+        private readonly PyObject module;
 
-        public PdlConverter(string script)
+        private readonly ILogger<IPythonEnvironment> logger;
+
+        public void Dispose()
         {
-            Engine = Python.CreateEngine();
-            Scope = Engine.CreateScope();
-            Engine.Execute(script, Scope);
+            logger.LogInformation("Disposing module");
+            module.Dispose();
         }
 
         public JObject ToJson(string protocol, string fileName)
         {
-            var parsedProtocol = Scope.loads(protocol, fileName);
-            var json = Scope.json.dumps(parsedProtocol);
+            using (GIL.Acquire())
+            {
+                logger.LogInformation("Invoking Python function: {FunctionName}", "loads");
+                using var __underlyingPythonFunc = this.module.GetAttr("loads");
+                using PyObject a_pyObject = PyObject.From(protocol);
+                using PyObject b_pyObject = PyObject.From(fileName);
+                using var parsedProtocol = __underlyingPythonFunc.Call(a_pyObject, b_pyObject);
 
-            return JObject.Parse(json.ToString());
+                logger.LogInformation("Invoking Python function: {FunctionName}", "json.dumps");
+                using var jsonFunc = this.module.GetAttr("json").GetAttr("dumps");
+                using var json = jsonFunc.Call(parsedProtocol);
+                logger.LogInformation("Parsing JSON result");
+                var jsonString = json.ToString();
+                logger.LogInformation("Converting JSON string to JObject");
+
+                return JObject.Parse(jsonString);
+            }
         }
     }
 }
