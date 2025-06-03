@@ -110,7 +110,11 @@
 
                 var pdlScript = await Chrome.GetInspectorProtocolConverterPythonScript(currentVersion);
 
-                var pdlConverter = new PdlConverter(pdlScript);
+                var (tempDir, scriptPath) = await SaveToTempFileAsync(pdlScript);
+                var (_, browserProtoPath) = await SaveToTempFileAsync(pdlScript, tempDir, "browser_protocol.pdl");
+                var (_, jsProtoPath) = await SaveToTempFileAsync(pdlScript, tempDir, "js_protocol.pdl");
+
+                var pdlConverter = new PdlConverter(tempDir);
                 var browserProtocol = pdlConverter.ToJson(browserProtocolPdl, "browser_protocol.pdl");
                 var jsProtocol = pdlConverter.ToJson(javaScriptProtocolPdl, "js_protocol.pdl");
 
@@ -126,6 +130,32 @@
             }
 
             return protocolData;
+        }
+
+        public static async Task<(string directoryPath, string filePath)> SaveToTempFileAsync(
+            string content,
+            string? directoryPath = null,
+            string? fileName = null)
+        {
+            // Выбираем имя файла
+            fileName ??= "converter.py";
+
+            // Создаём временную папку при необходимости
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                directoryPath = Path.Combine(Path.GetTempPath(), $"pdl_{Guid.NewGuid():N}");
+                Directory.CreateDirectory(directoryPath);
+            }
+            else if (!Directory.Exists(directoryPath))
+            {
+                throw new DirectoryNotFoundException($"Directory '{directoryPath}' does not exist.");
+            }
+
+            // Полный путь к файлу
+            string filePath = Path.Combine(directoryPath, fileName);
+            await File.WriteAllTextAsync(filePath, content);
+
+            return (directoryPath, filePath);
         }
 
         public static async Task<JsonSchema4> GetProtocolDefinitionSchema(CliArguments args)
