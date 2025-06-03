@@ -40,7 +40,7 @@
                     templateSettings = Settings.DefinitionTemplates.TypeEnumTemplate;
                     break;
                 case "array":
-                    templateSettings = Settings.DefinitionTemplates.TypeArrayWrapperTemplate;
+                    templateSettings = Settings.DefinitionTemplates.TypeArrayTemplate;
                     break;
                 default:
                     throw new InvalidOperationException($"Unsupported Type Definition Type: {typeDefinition.Type}");

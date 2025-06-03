@@ -13,41 +13,42 @@
             DomainTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "domain.hbs",
-                OutputPath = "{{domainName}}\\{{className}}Adapter.cs",
+                OutputPath = "{{domainName}}/{{className}}Adapter.cs",
             };
 
             CommandTemplate = new CodeGenerationTemplateSettings {
                 TemplatePath = "command.hbs",
-                OutputPath = "{{domainName}}\\{{className}}Command.cs",
+                OutputPath = "{{domainName}}/{{className}}Command.cs",
             };
 
             EventTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "event.hbs",
-                OutputPath = "{{domainName}}\\{{className}}Event.cs",
+                OutputPath = "{{domainName}}/{{className}}Event.cs",
             };
 
             TypeObjectTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "type-object.hbs",
-                OutputPath = "{{domainName}}\\{{className}}.cs",
+                OutputPath = "{{domainName}}/{{className}}.cs",
             };
 
             TypeHashTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "type-hash.hbs",
-                OutputPath = "{{domainName}}\\{{className}}.cs",
+                OutputPath = "{{domainName}}/{{className}}.cs",
             };
 
             TypeEnumTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "type-enum.hbs",
-                OutputPath = "{{domainName}}\\{{className}}.cs",
+                OutputPath = "{{domainName}}/{{className}}.cs",
             };
-            TypeArrayWrapperTemplate = new CodeGenerationTemplateSettings
+
+            TypeArrayTemplate = new CodeGenerationTemplateSettings
             {
                 TemplatePath = "type-array.hbs",
-                OutputPath = "{{domainName}}\\{{className}}.cs",
+                OutputPath = "{{domainName}}/{{className}}.cs",
             };
         }
 
@@ -93,8 +94,8 @@
             set;
         }
 
-        [JsonProperty("typeArrayWrapperTemplate")]
-        public CodeGenerationTemplateSettings TypeArrayWrapperTemplate { get; set; }
+        [JsonProperty("TypeArrayTemplate")]
+        public CodeGenerationTemplateSettings TypeArrayTemplate { get; set; }
 
     }
 }
