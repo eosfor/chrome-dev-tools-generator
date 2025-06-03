@@ -8,11 +8,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
-    using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Text.Json;
-    using Microsoft.Scripting.Utils;
 
     /// <summary>
     /// Uses IronPython to convert the chromium protocol to other formats using the provided chromium pdl script
