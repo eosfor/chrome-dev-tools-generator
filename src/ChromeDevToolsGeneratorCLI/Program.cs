@@ -13,6 +13,7 @@
     using System.IO;
     using System.Threading.Tasks;
     using System.Text;
+    using NJsonSchema.NewtonsoftJson.Generation;
 
     class Program
     {
@@ -158,20 +159,20 @@
             return (directoryPath, filePath);
         }
 
-        public static async Task<JsonSchema4> GetProtocolDefinitionSchema(CliArguments args)
+        public static async Task<JsonSchema> GetProtocolDefinitionSchema(CliArguments args)
         {
-            JsonSchema4 protocolSchema;
+            JsonSchema protocolSchema;
 
             if (args.GenerateProtocolSchema || !File.Exists(args.ProtocolSchemaPath))
             {
                 Console.WriteLine("Generating protocol definition from current generator interface...");
 
-                protocolSchema = await JsonSchema4.FromTypeAsync<ProtocolDefinition>(new JsonSchemaGeneratorSettings() { FlattenInheritanceHierarchy = true });
+                protocolSchema = JsonSchema.FromType<ProtocolDefinition>(new NewtonsoftJsonSchemaGeneratorSettings() { FlattenInheritanceHierarchy = true });
             }
             else
             {
                 Console.WriteLine("Using previously obtained protocol schema...");
-                protocolSchema = await JsonSchema4.FromFileAsync(args.ProtocolSchemaPath);
+                protocolSchema = await JsonSchema.FromFileAsync(args.ProtocolSchemaPath);
             }
 
             return protocolSchema;

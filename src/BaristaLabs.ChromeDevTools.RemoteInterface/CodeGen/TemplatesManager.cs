@@ -83,13 +83,15 @@
 
                 if (String.IsNullOrWhiteSpace(str))
                 {
-                    switch (context)
+                    switch (context.Value)
                     {
                         case ProtocolDefinitionItem pdi:
                             str = $"{pdi.Name}";
                             break;
                         default:
-                            str = context.className;
+                            var type = context.Value?.GetType();
+                            var prop = type?.GetProperty("ClassName") ?? type?.GetProperty("className");
+                            str = prop?.GetValue(context.Value)?.ToString() ?? "";
                             break;
                     }
                 }
@@ -100,7 +102,7 @@
                 {
                     int.TryParse(frontPaddingObj.ToString(), out frontPadding);
                 }
-                    
+
                 str = Utility.ReplaceLineEndings(str, Environment.NewLine + new StringBuilder(4 * frontPadding).Insert(0, "    ", frontPadding) + "/// ");
 
                 writer.WriteSafeString(str);
@@ -108,7 +110,7 @@
 
             Handlebars.RegisterHelper("typemap", (writer, context, arguments) =>
             {
-                var typeDefinition = context as TypeDefinition;
+                var typeDefinition = context.Value as TypeDefinition;
                 if (typeDefinition == null)
                 {
                     throw new HandlebarsException("{{typemap}} helper expects to be in the context of a TypeDefinition.");
@@ -128,7 +130,8 @@
             });
 
             Handlebars.Configuration.TextEncoder = null;
-            return Handlebars.Compile(templateContents);
+            //return Handlebars.Compile(templateContents);
+            return context => Handlebars.Compile(templateContents)(context)?.ToString() ?? "";
         }
     }
 }
